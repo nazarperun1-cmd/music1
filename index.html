@@ -1,157 +1,44 @@
-[23.08.2026 23:11] Nazar: <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Моя Музыкальная Платформа</title>
+    <title>Nazar — Player</title>
     <style>
         * { box-sizing: border-box; }
         body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0d0f12;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
             display: flex;
-            flex-direction: column;
             align-items: center;
+            justify-content: center;
         }
-        .container { width: 100%; max-width: 500px; }
         .card {
-            background-color: #1e293b;
-            padding: 24px;
+            background: #161b22;
+            border: 1px solid #30363d;
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
-        }
-        h2 { margin-top: 0; font-size: 20px; text-align: center; color: #38bdf8; }
-        .upload-zone {
-            border: 2px dashed #475569;
-            padding: 20px;
-            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             text-align: center;
-            background: #0f172a;
-            margin-bottom: 15px;
         }
-        input[type="file"], input[type="text"] {
-            width: 100%;
-            margin: 8px 0;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            background: #1e293b;
-            color: #fff;
-        }
-        button {
-            width: 100%;
-            background: #0284c7;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        button:hover { background: #0369a1; }
-        .track-item {
-            background: #0f172a;
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .track-info { font-weight: bold; font-size: 14px; }
-        audio { width: 100%; height: 36px; }
+        h2 { margin: 0 0 5px 0; font-size: 22px; color: #f0f6fc; }
+        p { margin: 0 0 25px 0; font-size: 14px; color: #8b949e; }
+        audio { width: 100%; outline: none; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Форма загрузки прямо на сайте -->
-    <div class="card">
-        <h2>Загрузить новый трек</h2>
-        <div class="upload-zone">
-            <input type="text" id="trackTitle" placeholder="Название трека">
-            <input type="text" id="trackArtist" placeholder="Исполнитель">
-            <input type="file" id="audioFile" accept="audio/*">
-            <button onclick="saveTrack()">Опубликовать на сайте</button>
-        </div>
-    </div>
-
-    <!-- Список загруженных треков -->
-    <div class="card">
-        <h2>Плейлист</h2>
-        <div id="playlist"></div>
-    </div>
+<div class="card">
+    <h2>Мой Трек</h2>
+    <p>Nazar</p>
+    <audio controls src="https://www.dropbox.com/scl/fi/r88s3juenr6pmyouh1qju/track1.mp3.mp3?rlkey=e2bn431gz94nl5flxipwhumd3&st=ddr5kf32&raw=1"></audio>
 </div>
-
-<script>
-    // Инициализация базы данных в браузере
-    let db;
-    const request = indexedDB.open("MusicSiteDB", 1);
-
-    request.onupgradeneeded = (e) => {
-        db = e.target.result;
-        db.createObjectStore("tracks", { keyPath: "id", autoIncrement: true });
-    };
-
-    request.onsuccess = (e) => {
-        db = e.target.result;
-        loadPlaylist();
-    };
-
-    function saveTrack() {
-        const title = document.getElementById("trackTitle").value || "Без названия";
-        const artist = document.getElementById("trackArtist").value || "Неизвестен";
-        const fileInput = document.getElementById("audioFile");
-
-        if (!fileInput.files[0]) {
-            alert("Пожалуйста, выберите MP3 файл!");
-            return;
-        }
-
-        const file = fileInput.files[0];
-        const transaction = db.transaction(["tracks"], "readwrite");
-        const store = transaction.objectStore("tracks");
-
-        store.add({ title, artist, file });
-
-        transaction.oncomplete = () => {
-            document.getElementById("trackTitle").value = "";
-            document.getElementById("trackArtist").value = "";
-            fileInput.value = "";
-            loadPlaylist();
-        };
-    }
-
-    function loadPlaylist() {
-        const playlist = document.getElementById("playlist");
-        playlist.innerHTML = "";
-[23.08.2026 23:11] Nazar: const transaction = db.transaction(["tracks"], "readonly");
-        const store = transaction.objectStore("tracks");
-
-        store.openCursor().onsuccess = (e) => {
-            const cursor = e.target.result;
-            if (cursor) {
-                const track = cursor.value;
-                const audioUrl = URL.createObjectURL(track.file);
-
-                const item = document.createElement("div");
-                item.className = "track-item";
-                item.innerHTML = 
-                    <div class="track-info">🎵 ${track.artist} — ${track.title}</div>
-                    <audio controls src="${audioUrl}"></audio>
-                ;
-                playlist.appendChild(item);
-                cursor.continue();
-            }
-        };
-    }
-</script>
 
 </body>
 </html>
